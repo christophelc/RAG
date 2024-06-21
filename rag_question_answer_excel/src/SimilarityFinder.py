@@ -2,21 +2,26 @@ import numpy as np
 from tinydb import TinyDB, Query
 from sklearn.metrics.pairwise import cosine_similarity
 import torch
+import chromadb
+from chromadb.utils import embedding_functions
 
 class SimilarityFinder:
     def __init__(self, db_name, model_embedding):
-        self.db = TinyDB(db_name)
+        self.client = chromadb.PersistentClient(db_name)
+        sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name = "multi-qa-MiniLM-L6-cos-v1")
+        self.collection = self.client.get_or_create_collection(name="pdf", embedding_function= sentence_transformer_ef)
+
         self.model = model_embedding
         self.query = Query()
 
     def semantic_search(self, query, top_k, accuracy):
-        query_embedding = self.model.encode(query).reshape(1, -1)
-        corpus_embedding = [torch.as_tensor(item["embedding"]) for item in self.db.all()]
-        hits = self.model.semantic_search(query_embedding, corpus_embedding, top_k)[0]
-        iterator = filter(lambda hit: hit["score"] >= accuracy, hits)
-        corpus = [data["Answers"] for data in self.db.all()] 
-        results = [corpus[hit["corpus_id"]] for hit in iterator]
-        return results
+        results = self.collection.query(
+            query_texts = [query],
+            n_results = top_k
+        )
+        documents = results["documents"][0]
+        print(documents)
+        return documents
 
     def print_results(self, user_query, top_k, accuracy):
         results = self.semantic_search(user_query, top_k, accuracy)

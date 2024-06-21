@@ -18,7 +18,7 @@ class Rag:
             llm_proxy = ModelProxyAPI()        
     ):
         self.gen = AnswerGenerator(
-                db_name = "data_embedding.json",
+                db_name = "embedding_pdf",
                 model_embedding = model_embedding,
                 cross_encoder = cross_encoder,
                 accuracy = 0.3,
