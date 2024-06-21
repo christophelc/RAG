@@ -4,6 +4,13 @@ from ModelProxyAPI import *
 from Reranking import *
 import time
 
+message_init = {
+                "role" : "system",
+                "content": """
+                You are a flower assistant who answers questions in a concise style. Provide answers only according to the following sentences starting with 'kw:'.
+                """
+}
+
 class Rag:
     def __init__(
             self,

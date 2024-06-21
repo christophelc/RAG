@@ -6,14 +6,7 @@ st.title("Flower assistant")
 
 #initialize chat history
 if "messages" not in st.session_state:
-    messages = [
-            {
-                "role" : "system",
-                "content": """
-                You are a flower assistant who answers questions in a concise style. Provide answers only according to the following sentences starting with 'kw:'.
-                """
-            },
-        ]
+    messages = [message_init]
     st.session_state.messages = messages
 
 #Display chat messages from history on app return
